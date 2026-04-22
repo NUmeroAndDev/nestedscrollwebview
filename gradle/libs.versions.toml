@@ -1,0 +1,51 @@
+[versions]
+androidGradlePlugin = "9.1.1"
+kotlin = "2.3.0"
+ksp = "2.3.4"
+
+lifecycle = "2.10.0"
+compose = "1.10.6"
+material3 = "1.4.0"
+material3Adaptive = "1.2.0"
+
+hilt = "2.59.2"
+
+junit = "4.13.2"
+androidx-test-ext-junit = "1.3.0"
+espresso-core = "3.7.0"
+
+[libraries]
+kotlinxCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
+
+androidxActivity = "androidx.activity:activity-compose:1.13.0"
+androidxCore = "androidx.core:core-ktx:1.18.0"
+androidxCoreSplash = "androidx.core:core-splashscreen:1.2.0"
+androidxNavigationCompose = "androidx.navigation:navigation-compose:2.9.7"
+androidxProfileInstaller = "androidx.profileinstaller:profileinstaller:1.4.1"
+
+androidxComposeUi = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+androidxComposeUiTooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+androidxComposeUiToolingPreview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+androidxComposeFoundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
+androidxComposeMaterial3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+androidxComposeMaterial3Adaptive = { module = "androidx.compose.material3.adaptive:adaptive", version.ref = "material3Adaptive" }
+androidxComposeUiTest = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose" }
+
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
+espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
+
+# For build-logic
+androidGradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
+kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+hiltPlugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
+kspPlugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+
+[bundles]
+testing = [
+    "junit",
+]
