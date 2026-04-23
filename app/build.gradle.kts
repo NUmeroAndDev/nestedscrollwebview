@@ -3,10 +3,10 @@ plugins {
 }
 
 android {
-    namespace = "jp.numero.nestedwebview.app"
+    namespace = "com.github.numeroanddev.nestedwebview.app"
 
     defaultConfig {
-        applicationId = "jp.numero.nestedwebview.app"
+        applicationId = "com.github.numeroanddev.nestedwebview.app"
         versionCode = 1
         versionName = "1.0"
 

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "jp.numero.nestedscrollwebview"
+    namespace = "com.github.numeroanddev.nestedscrollwebview"
 }
 
 dependencies {

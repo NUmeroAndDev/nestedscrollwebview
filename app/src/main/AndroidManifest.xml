@@ -15,7 +15,7 @@
         android:theme="@style/Theme.TemplateApp"
         tools:targetApi="31">
         <activity
-            android:name="jp.numero.nestedwebview.app.MainActivity"
+            android:name="com.github.numeroanddev.nestedwebview.app.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.TemplateApp">
             <intent-filter>

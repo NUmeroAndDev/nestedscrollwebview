@@ -1,14 +1,11 @@
 [versions]
 androidGradlePlugin = "9.1.1"
 kotlin = "2.3.0"
-ksp = "2.3.4"
 
 lifecycle = "2.10.0"
 compose = "1.10.6"
 material3 = "1.5.0-alpha17"
 material3Adaptive = "1.2.0"
-
-hilt = "2.59.2"
 
 junit = "4.13.2"
 androidx-test-ext-junit = "1.3.0"
@@ -42,8 +39,6 @@ espresso-core = { group = "androidx.test.espresso", name = "espresso-core", vers
 # For build-logic
 androidGradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
 kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-hiltPlugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
-kspPlugin = { module = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "androidGradlePlugin" }

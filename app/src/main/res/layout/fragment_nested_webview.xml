@@ -34,7 +34,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <jp.numero.nestedscrollwebview.NestedScrollWebView
+        <com.github.numeroanddev.nestedscrollwebview.NestedScrollWebView
             android:id="@+id/webview"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
