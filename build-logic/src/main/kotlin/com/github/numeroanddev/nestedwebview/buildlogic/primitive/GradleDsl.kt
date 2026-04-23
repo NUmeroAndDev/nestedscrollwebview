@@ -28,7 +28,7 @@ fun Project.commonConfiguration() {
         compileSdkVersion(36)
 
         defaultConfig {
-            minSdk = 24
+            minSdk = 23
             targetSdk = 36
 
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -41,8 +41,8 @@ fun Project.commonConfiguration() {
         }
 
         compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_17
-            targetCompatibility = JavaVersion.VERSION_17
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
         }
 
         dependencies {
