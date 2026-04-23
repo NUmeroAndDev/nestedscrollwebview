@@ -75,8 +75,8 @@ public open class NestedScrollWebView @JvmOverloads constructor(
                     )
                 ) {
                     deltaYInt -= scrollConsumed[1]
-                    trackedEvent.offsetLocation(0f, scrollOffset[1].toFloat())
-                    nestedYOffset += scrollOffset[1]
+                    trackedEvent.offsetLocation(0f, scrollConsumed[1].toFloat())
+                    nestedYOffset += scrollConsumed[1].toFloat() + scrollOffset[1].toFloat()
                 }
 
                 lastMotionY = y - scrollOffset[1]
@@ -104,7 +104,9 @@ public open class NestedScrollWebView @JvmOverloads constructor(
                 )
 
                 lastMotionY -= scrollOffset[1]
-                nestedYOffset += scrollOffset[1]
+                nestedYOffset += scrollOffset[1].toFloat()
+                trackedEvent.offsetLocation(0f, scrollOffset[1].toFloat())
+
                 velocityTracker?.addMovement(trackedEvent)
             }
 
