@@ -3,7 +3,10 @@ package com.github.numeroanddev.nestedscrollwebview
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.VelocityTracker
+import android.view.ViewConfiguration
 import android.webkit.WebView
+import android.widget.OverScroller
 import androidx.core.view.NestedScrollingChild3
 import androidx.core.view.NestedScrollingChildHelper
 import androidx.core.view.ViewCompat
@@ -18,18 +21,21 @@ public open class NestedScrollWebView @JvmOverloads constructor(
     private val childHelper: NestedScrollingChildHelper = NestedScrollingChildHelper(this)
     private val scrollOffset = IntArray(2)
     private val scrollConsumed = IntArray(2)
+    private val scroller: OverScroller = OverScroller(context)
 
+    private var lastFlingY: Int = 0
     private var lastMotionY: Float = 0f
     private var nestedYOffset: Float = 0f
     private var remainderY: Float = 0f
+    private var totalScrollOffset: Float = 0f
 
-    private var velocityTracker: android.view.VelocityTracker? = null
+    private var velocityTracker: VelocityTracker? = null
     private var minimumVelocity = 0
     private var maximumVelocity = 0
 
     init {
         isNestedScrollingEnabled = true
-        val configuration = android.view.ViewConfiguration.get(context)
+        val configuration = ViewConfiguration.get(context)
         minimumVelocity = configuration.scaledMinimumFlingVelocity
         maximumVelocity = configuration.scaledMaximumFlingVelocity
     }
@@ -37,7 +43,7 @@ public open class NestedScrollWebView @JvmOverloads constructor(
     @android.annotation.SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (velocityTracker == null) {
-            velocityTracker = android.view.VelocityTracker.obtain()
+            velocityTracker = VelocityTracker.obtain()
         }
         var result: Boolean
         val trackedEvent = MotionEvent.obtain(event)
@@ -45,11 +51,21 @@ public open class NestedScrollWebView @JvmOverloads constructor(
 
         if (action == MotionEvent.ACTION_DOWN) {
             nestedYOffset = 0f
+            totalScrollOffset = 0f
             remainderY = 0f
+            scrollOffset[0] = 0
+            scrollOffset[1] = 0
+            scrollConsumed[0] = 0
+            scrollConsumed[1] = 0
+            scroller.abortAnimation()
+            stopNestedScroll(ViewCompat.TYPE_NON_TOUCH)
         }
 
         val y = event.y
         trackedEvent.offsetLocation(0f, nestedYOffset)
+
+        val velocityTrackerEvent = MotionEvent.obtain(event)
+        velocityTrackerEvent.offsetLocation(0f, totalScrollOffset)
 
         when (action) {
             MotionEvent.ACTION_DOWN -> {
@@ -57,7 +73,7 @@ public open class NestedScrollWebView @JvmOverloads constructor(
                 lastMotionY = y
                 startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL, ViewCompat.TYPE_TOUCH)
                 result = super.onTouchEvent(trackedEvent)
-                velocityTracker?.addMovement(trackedEvent)
+                velocityTracker?.addMovement(velocityTrackerEvent)
             }
 
             MotionEvent.ACTION_MOVE -> {
@@ -77,6 +93,7 @@ public open class NestedScrollWebView @JvmOverloads constructor(
                     deltaYInt -= scrollConsumed[1]
                     trackedEvent.offsetLocation(0f, scrollConsumed[1].toFloat())
                     nestedYOffset += scrollConsumed[1].toFloat() + scrollOffset[1].toFloat()
+                    totalScrollOffset += scrollOffset[1].toFloat()
                 }
 
                 lastMotionY = y - scrollOffset[1]
@@ -105,13 +122,14 @@ public open class NestedScrollWebView @JvmOverloads constructor(
 
                 lastMotionY -= scrollOffset[1]
                 nestedYOffset += scrollOffset[1].toFloat()
+                totalScrollOffset += scrollOffset[1].toFloat()
                 trackedEvent.offsetLocation(0f, scrollOffset[1].toFloat())
-
-                velocityTracker?.addMovement(trackedEvent)
+                velocityTrackerEvent.offsetLocation(0f, scrollOffset[1].toFloat())
+                velocityTracker?.addMovement(velocityTrackerEvent)
             }
 
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                velocityTracker?.addMovement(trackedEvent)
+                velocityTracker?.addMovement(velocityTrackerEvent)
                 velocityTracker?.computeCurrentVelocity(1000, maximumVelocity.toFloat())
                 var yVelocity = -(velocityTracker?.yVelocity ?: 0f)
 
@@ -120,12 +138,15 @@ public open class NestedScrollWebView @JvmOverloads constructor(
                 }
 
                 val consumed = dispatchNestedPreFling(0f, yVelocity)
-                if (!consumed) {
-                    dispatchNestedFling(0f, yVelocity, true)
-                }
 
-                if (consumed && action == MotionEvent.ACTION_UP) {
-                    trackedEvent.action = MotionEvent.ACTION_CANCEL
+                if (yVelocity != 0f) {
+                    if (!consumed) {
+                        dispatchNestedFling(0f, yVelocity, true)
+                        fling(yVelocity.toInt())
+                    }
+                    if (action == MotionEvent.ACTION_UP) {
+                        trackedEvent.action = MotionEvent.ACTION_CANCEL
+                    }
                 }
 
                 result = super.onTouchEvent(trackedEvent)
@@ -140,6 +161,7 @@ public open class NestedScrollWebView @JvmOverloads constructor(
             }
         }
 
+        velocityTrackerEvent.recycle()
         trackedEvent.recycle()
         return result
     }
@@ -241,5 +263,71 @@ public open class NestedScrollWebView @JvmOverloads constructor(
 
     override fun dispatchNestedPreFling(velocityX: Float, velocityY: Float): Boolean {
         return childHelper.dispatchNestedPreFling(velocityX, velocityY)
+    }
+
+    private fun fling(velocityY: Int) {
+        startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL, ViewCompat.TYPE_NON_TOUCH)
+        scroller.fling(
+            scrollX, scrollY,
+            0, velocityY,
+            0, 0,
+            Int.MIN_VALUE, Int.MAX_VALUE,
+            0, 0
+        )
+        lastFlingY = scrollY
+        postInvalidateOnAnimation()
+    }
+
+    override fun computeScroll() {
+        super.computeScroll()
+        if (scroller.computeScrollOffset()) {
+            val y = scroller.currY
+            var unconsumed = y - lastFlingY
+            lastFlingY = y
+
+            scrollConsumed[0] = 0
+            scrollConsumed[1] = 0
+            if (dispatchNestedPreScroll(
+                    0,
+                    unconsumed,
+                    scrollConsumed,
+                    null,
+                    ViewCompat.TYPE_NON_TOUCH
+                )
+            ) {
+                unconsumed -= scrollConsumed[1]
+            }
+
+            val oldScrollY = scrollY
+            val maxScrollY =
+                (computeVerticalScrollRange() - computeVerticalScrollExtent()).coerceAtLeast(0)
+            val targetScrollY = (oldScrollY + unconsumed).coerceIn(0, maxScrollY)
+            val scrolledByMe = targetScrollY - oldScrollY
+
+            scrollTo(scrollX, targetScrollY)
+            unconsumed -= scrolledByMe
+
+            scrollConsumed[0] = 0
+            scrollConsumed[1] = 0
+            dispatchNestedScroll(
+                0, scrolledByMe,
+                0, unconsumed,
+                null,
+                ViewCompat.TYPE_NON_TOUCH,
+                scrollConsumed
+            )
+
+            val unconsumedAfterParent = unconsumed - scrollConsumed[1]
+            if (unconsumedAfterParent != 0) {
+                scroller.abortAnimation()
+                stopNestedScroll(ViewCompat.TYPE_NON_TOUCH)
+            }
+
+            postInvalidateOnAnimation()
+        } else {
+            if (hasNestedScrollingParent(ViewCompat.TYPE_NON_TOUCH)) {
+                stopNestedScroll(ViewCompat.TYPE_NON_TOUCH)
+            }
+        }
     }
 }
