@@ -31,7 +31,7 @@ androidxComposeMaterial3 = { module = "androidx.compose.material3:material3", ve
 androidxComposeMaterial3Adaptive = { module = "androidx.compose.material3.adaptive:adaptive", version.ref = "material3Adaptive" }
 androidxComposeUiTest = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose" }
 
-material = "com.google.android.material:material:1.14.0-beta01"
+material = "com.google.android.material:material:1.14.0"
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
