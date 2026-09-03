@@ -4,7 +4,7 @@ kotlin = "2.3.20"
 
 lifecycle = "2.10.0"
 compose = "1.11.0"
-material3 = "1.5.0-alpha18"
+material3 = "1.5.0-alpha27"
 material3Adaptive = "1.2.0"
 
 junit = "4.13.2"
